@@ -23,4 +23,10 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'linebreak-style': ['error', 'unix'],
   },
+  extends: [
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'prettier'
+  ]
+  
 };
