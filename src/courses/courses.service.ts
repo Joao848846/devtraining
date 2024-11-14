@@ -32,10 +32,12 @@ export class CoursesService {
 
   update(id: number, updateCourseDTO: any) {
     const existing = this.findOne(id);
+    console.log(existing);
     if (existing as any) {
       const index = this.courses.findIndex((Course) => Course.id === id);
       this.courses[index] = {
         id,
+        ...existing,
         ...updateCourseDTO,
       };
     }
