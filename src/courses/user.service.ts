@@ -1,41 +1,54 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Users } from './user.entity';
+import { Users } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private users: Users[] = [
-    {
-      id: 1,
-      name: 'teste',
-      surname: 'QA',
-      email: 'teste@gmail.com',
-      age: 10,
-    },
-  ];
-
-  create(createUserDTO: any) {
-    this.users.push(createUserDTO); // Adiciona o novo usuário à lista de usuários
-    return createUserDTO; // Retorna o usuário recém-criado
+  constructor(
+    @InjectRepository(Users)
+    private readonly userRepository: Repository<Users>,
+  ) {
+    console.log('Repositório injetado?', !!userRepository);
   }
 
-  // Método para retornar todos os usuários
-  findAll() {
-    return this.users;
+  async create(createUserDTO: any) {
+    const user = this.userRepository.create(createUserDTO);
+    return this.userRepository.save(user);
   }
 
-  findOne(id: number) {
-    const usuario = this.users.find((User) => User.id === id);
-    console.log(usuario);
+  async findAll() {
+    return this.userRepository.find();
+  }
+
+  async findOne(id: number) {
+    const usuario = await this.userRepository.findOne({
+      where: { id },
+    });
     if (!usuario) {
       throw new NotFoundException(`O id ${id} não tem registro no sistema`);
     }
     return usuario;
   }
 
-  remove(id: number) {
-    const index = this.users.findIndex((User) => User.id === id);
-    if (index <= 0) {
-      this.users.splice(index, 1);
+  async remove(id: number) {
+    const index = await this.userRepository.findOne({
+      where: { id },
+    });
+    if (!index) {
+      throw new NotFoundException(`Registro não encontrado`);
     }
+    return this.userRepository.remove(index);
+  }
+
+  async update(id: number, updateUserDTO: any) {
+    const nanny = await this.userRepository.preload({
+      ...updateUserDTO,
+      id,
+    });
+    if (!nanny) {
+      throw new NotFoundException(`Registro não encontrado no sistema`);
+    }
+    return this.userRepository.save(nanny);
   }
 }

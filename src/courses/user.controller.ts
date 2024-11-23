@@ -1,10 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UsersService } from './user.service'; // Certifique-se de que o caminho está correto
 import { UserCourseDTO } from './dto/users-login.dto'; // Corrija o caminho do DTO se necessário
+import { UpdateCourseDTO } from './dto/update-login.dto';
 
 @Controller('user')
 export class UserController {
-  // A dependência deve ser injetada usando 'userService' com 'u' minúsculo
   constructor(private readonly userService: UsersService) {}
 
   @Get()
@@ -14,7 +22,7 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Post()
@@ -25,6 +33,11 @@ export class UserController {
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.userService.remove(+id);
+    return this.userService.remove(id);
+  }
+  @Put(':id')
+  update(@Param('id') id: number, @Body() updateLoginDTO: UpdateCourseDTO) {
+    console.log(updateLoginDTO);
+    return this.userService.update(id, updateLoginDTO);
   }
 }
